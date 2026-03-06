@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NGC Varanasi Attendance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #10b981; 
+            --primary-dark: #059669;
+            --dark: #0f172a; 
+            --bg: #f8fafc; 
+            --card: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg); 
+            margin: 0; padding: 0; 
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Modern Glass Header */
+        .header { 
+            background: var(--dark);
+            background-image: radial-gradient(circle at 20% 150%, #10b98133 0%, transparent 50%);
+            color: white; 
+            padding: 40px 25px 50px; 
+            border-bottom-left-radius: 40px; 
+            border-bottom-right-radius: 40px; 
+            display: flex; align-items: center; gap: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .header-icon { 
+            width: 55px; height: 55px; 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+            border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 26px; font-weight: 800;
+            box-shadow: 0 8px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .header h1 { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -0.5px; }
+        .header p { margin: 4px 0 0; font-size: 11px; opacity: 0.7; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; }
+
+        .container { max-width: 500px; margin: -30px auto 0; padding: 0 20px 140px; }
+
+        /* Staff Card */
+        .staff-card { 
+            background: var(--card); border-radius: 24px; padding: 20px; 
+            margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .staff-name { font-size: 16px; font-weight: 700; color: var(--dark); }
+        .status-badge { font-size: 10px; font-weight: 800; background: #ecfdf5; color: var(--primary); padding: 4px 12px; border-radius: 10px; text-transform: uppercase; }
+
+        .card-bottom { display: flex; gap: 10px; }
+        select, input[type="time"] { flex: 1; padding: 12px; border-radius: 14px; border: 1.5px solid #f1f5f9; background: #f8fafc; font-size: 13px; font-weight: 600; outline: none; }
+
+        /* Floating Nav Bar */
+        .nav-bar { 
+            position: fixed; bottom: 25px; left: 20px; right: 20px; 
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+            border-radius: 24px; padding: 12px; display: flex; 
+            justify-content: space-between; align-items: center; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); z-index: 1000;
+        }
+
+        .btn-main { 
+            background: var(--primary); color: white; border: none; padding: 14px 24px; 
+            border-radius: 18px; font-weight: 800; font-size: 13px; cursor: pointer;
+        }
+
+        /* Monthly Report Modal */
+        #reportModal {
+            position: fixed; inset: 0; background: white; z-index: 3000;
+            display: none; flex-direction: column; padding: 30px 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .report-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .report-table th { text-align: left; font-size: 12px; color: var(--text-sub); padding: 10px; border-bottom: 2px solid #f1f5f9; }
+        .report-table td { padding: 15px 10px; font-size: 14px; font-weight: 600; border-bottom: 1px solid #f8fafc; }
+
+        .count-p { color: var(--primary); }
+        .count-l { color: #ef4444; }
+        .count-h { color: #f59e0b; }
+
+        /* Settings Panel */
+        .admin-box { background: white; border-radius: 28px; padding: 25px; margin-top: 20px; border: 2px solid #f1f5f9; }
+        .admin-input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 14px; border: 1.5px solid #f1f5f9; font-size: 14px; }
+        .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #f8fafc; border-radius: 14px; margin-bottom: 8px; }
+
+        #loginScreen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
+        .pin-box { width: 220px; padding: 18px; font-size: 28px; text-align: center; border: 2px solid #f1f5f9; border-radius: 20px; letter-spacing: 12px; margin-bottom: 25px; background: #f8fafc; }
+    </style>
+</head>
+<body>
+
+<div id="loginScreen">
+    <div class="header-icon" style="margin-bottom: 20px; width: 70px; height: 70px; font-size: 32px;">N</div>
+    <h2 style="margin:0; font-weight: 800; color: var(--dark);">NGC VARANASI</h2>
+    <p style="color: var(--text-sub); margin-bottom: 30px; font-weight: 600;">Enter your PIN</p>
+    <input type="password" id="pinEntry" class="pin-box" placeholder="••••" maxlength="4">
+    <button onclick="checkPin()" class="btn-main" style="padding: 16px 60px; font-size: 15px;">UNLOCK APP</button>
+</div>
+
+<div id="mainApp" style="display:none;">
+    <div class="header">
+        <div class="header-icon">N</div>
+        <div>
+            <h1>NORTHERN GOODS CARRIER</h1>
+            <p>Varanasi Terminal</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:35px 5px 20px;">
+            <span style="font-weight: 800; font-size: 20px;">Attendance</span>
+            <div style="display:flex; gap: 10px;">
+                <button onclick="showReport()" style="background: white; border: 1.5px solid #f1f5f9; padding: 10px; border-radius: 14px; cursor: pointer;">📊</button>
+                <button onclick="toggleSettings()" style="background: white; border: 1.5px solid #f1f5f9; padding: 10px 15px; border-radius: 14px; font-weight: 700; font-size: 12px; cursor: pointer;">Settings</button>
+            </div>
+        </div>
+
+        <div id="settingsBox" style="display:none;" class="admin-box">
+            <h4 style="margin:0 0 10px; font-size: 11px; color: var(--text-sub);">SECURITY</h4>
+            <input type="password" id="newPin" class="admin-input" placeholder="Set New PIN" maxlength="4">
+            <button onclick="updatePin()" class="btn-main" style="width:100%; margin-bottom: 20px; background: var(--dark);">UPDATE PIN</button>
+            <h4 style="margin:0 0 10px; font-size: 11px; color: var(--text-sub);">MANAGE STAFF</h4>
+            <input type="text" id="newStaffName" class="admin-input" placeholder="Staff Name">
+            <button onclick="addStaff()" class="btn-main" style="width:100%;">ADD STAFF</button>
+            <div id="manageStaffList" style="margin-top: 20px;"></div>
+        </div>
+        
+        <div id="staffList"></div>
+    </div>
+
+    <div id="reportModal">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="margin:0; font-weight: 800;">Monthly Report</h2>
+            <button onclick="closeReport()" style="background:none; border:none; font-size: 20px; cursor: pointer;">✕</button>
+        </div>
+        <p style="color: var(--text-sub); font-size: 13px;">Summary of current month</p>
+        <table class="report-table">
+            <thead>
+                <tr><th>STAFF NAME</th><th>P</th><th>L</th><th>H</th></tr>
+            </thead>
+            <tbody id="reportContent"></tbody>
+        </table>
+        <p style="margin-top: 20px; font-size: 11px; color: var(--text-sub);">* P: Present, L: Leave, H: Half-Day</p>
+    </div>
+
+    <div class="nav-bar">
+        <div style="color: white; padding-left: 10px;">
+            <div id="dateDisplay" style="font-size: 13px; font-weight: 800;"></div>
+            <div style="font-size: 10px; opacity: 0.6; font-weight: 600;">Status: Ready</div>
+        </div>
+        <button class="btn-main" onclick="saveAndShare()">SHARE REPORT</button>
+    </div>
+</div>
+
+<script>
+    let APP_PIN = localStorage.getItem('ngc_pin') || "1234";
+    let employees = JSON.parse(localStorage.getItem('ngc_staff_list')) || ["Anand Tripathi", "Sachin Yadav", "Shivam Gupta", "Saurabh", "Ram Bharos Yadav", "Prince Tiwari", "Aakash", "Vishal"];
+    let history = JSON.parse(localStorage.getItem('ngc_history')) || [];
+    let currentAttendance = {};
+
+    function checkPin() {
+        if (document.getElementById('pinEntry').value === APP_PIN) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+            init();
+        } else { alert("Incorrect PIN!"); }
+    }
+
+    function init() {
+        employees.forEach(name => { 
+            if(!currentAttendance[name]) currentAttendance[name] = { status: "Present", time: "09:30" }; 
+        });
+        render();
+        renderManageList();
+    }
+
+    function render() {
+        const list = document.getElementById('staffList');
+        list.innerHTML = '';
+        employees.forEach(name => {
+            const data = currentAttendance[name];
+            list.innerHTML += `
+                <div class="staff-card">
+                    <div class="card-top">
+                        <span class="staff-name">${name}</span>
+                        <span class="status-badge" style="${data.status !== 'Present' ? 'background:#fff1f2; color:#ef4444;' : ''}">${data.status}</span>
+                    </div>
+                    <div class="card-bottom">
+                        <select onchange="updateStatus('${name}', this.value)">
+                            <option value="Present" ${data.status === 'Present' ? 'selected' : ''}>Present</option>
+                            <option value="Half-Day" ${data.status === 'Half-Day' ? 'selected' : ''}>Half-Day</option>
+                            <option value="Leave" ${data.status === 'Leave' ? 'selected' : ''}>Leave</option>
+                        </select>
+                        <input type="time" value="${data.time}" onchange="updateTime('${name}', this.value)" ${data.status !== 'Present' ? 'disabled' : ''}>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function showReport() {
+        const content = document.getElementById('reportContent');
+        content.innerHTML = '';
+        employees.forEach(name => {
+            let p = 0, l = 0, h = 0;
+            history.forEach(entry => {
+                if(entry.data[name]) {
+                    if(entry.data[name].status === "Present") p++;
+                    else if(entry.data[name].status === "Leave") l++;
+                    else h++;
+                }
+            });
+            content.innerHTML += `<tr><td>${name}</td><td class="count-p">${p}</td><td class="count-l">${l}</td><td class="count-h">${h}</td></tr>`;
+        });
+        document.getElementById('reportModal').style.display = 'flex';
+    }
+
+    function closeReport() { document.getElementById('reportModal').style.display = 'none'; }
+    function toggleSettings() { let s = document.getElementById('settingsBox'); s.style.display = (s.style.display === 'none' ? 'block' : 'none'); }
+
+    function saveAndShare() {
+        const dateStr = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+        
+        // Save to History for Monthly Report
+        history = history.filter(h => h.date !== dateStr);
+        history.push({ date: dateStr, data: JSON.parse(JSON.stringify(currentAttendance)) });
+        localStorage.setItem('ngc_history', JSON.stringify(history));
+
+        // Classic WhatsApp Format
+        let message = `*NORTHERN GOODS CARRIER*%0A*VARANASI ATTENDANCE*%0A*Date:* ${dateStr}%0A----------------------------%0A%0A`;
+        employees.forEach(name => {
+            let d = currentAttendance[name];
+            message += `*${name.toUpperCase()}*: ${d.status === "Present" ? d.time : d.status.toUpperCase()}%0A`;
+        });
+        message += `%0A----------------------------%0A*Report by Varanasi Depot*`;
+        window.location.href = `whatsapp://send?text=${message}`;
+    }
+
+    function renderManageList() {
+        const manageList = document.getElementById('manageStaffList');
+        manageList.innerHTML = '';
+        employees.forEach((name, index) => {
+            manageList.innerHTML += `<div class="manage-item"><span>${name}</span><span style="color:#ef4444; font-weight:bold; cursor:pointer;" onclick="removeStaff(${index})">REMOVE</span></div>`;
+        });
+    }
+
+    function removeStaff(index) {
+        if(confirm("Remove this staff?")) {
+            employees.splice(index, 1);
+            localStorage.setItem('ngc_staff_list', JSON.stringify(employees));
+            render(); renderManageList();
+        }
+    }
+
+    function updatePin() {
+        const pin = document.getElementById('newPin').value;
+        if(pin.length === 4) { APP_PIN = pin; localStorage.setItem('ngc_pin', pin); alert("PIN Updated!"); toggleSettings(); }
+    }
+
+    function addStaff() {
+        let n = document.getElementById('newStaffName').value.trim();
+        if(n) {
+            employees.push(n);
+            localStorage.setItem('ngc_staff_list', JSON.stringify(employees));
+            currentAttendance[n] = {status:"Present", time:"09:30"};
+            render(); renderManageList();
+            document.getElementById('newStaffName').value = '';
+        }
+    }
+
+    function updateStatus(name, val) { currentAttendance[name].status = val; render(); }
+    function updateTime(name, val) { currentAttendance[name].time = val; }
+</script>
+</body>
+</html>
