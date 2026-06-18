@@ -429,7 +429,6 @@ function changeStatus(name, val) {
     render();
 }
 
-// Data ko save rakhne ke liye localStorage use karein (taki app band hone par staff delete na ho)
 function addStaff() {
     let n = document.getElementById("newStaff").value.trim().toUpperCase();
     if (!n) return;
@@ -445,10 +444,12 @@ function removeStaff(n) {
     }
 }
 
+// Fixed function (Removed .style.style)
 function toggleModal(show) {
-    document.getElementById("modalOverlay").style.style.display = show ? "flex" : "none";
+    document.getElementById("modalOverlay").style.display = show ? "flex" : "none";
 }
 
+// Close Modal on Outside Click
 function closeModalOutside(e) {
     if (e.target.id === "modalOverlay") {
         toggleModal(false);
