@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NGC Attendance Pro</title>
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <style>
         :root {
             --primary: #2563eb;
@@ -350,13 +356,20 @@
             <button class="add-btn" onclick="addStaff()">Add</button>
         </div>
 
-        <div class="manage-list" id="manageList">
-            </div>
+        <div class="manage-list" id="manageList"></div>
     </div>
 </div>
 
 <script>
-// Initial Data
+// Service Worker Registration for PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker Registered'))
+        .catch(err => console.log('Service Worker Failed', err));
+    });
+}
+
 const attendance = {
     "ANAND TRIPATHI": "09:30",
     "SACHIN YADAV": "09:30",
@@ -368,7 +381,6 @@ const attendance = {
     "VISHAL": "09:30"
 };
 
-// Render Main Attendance Screen
 function render() {
     let out = "";
     for (let n in attendance) {
@@ -398,7 +410,6 @@ function render() {
     renderManageList();
 }
 
-// Render Staff List Inside Popup (With Delete Button)
 function renderManageList() {
     let out = "";
     for (let n in attendance) {
@@ -411,7 +422,6 @@ function renderManageList() {
     document.getElementById("manageList").innerHTML = out ? out : '<div style="text-align:center; padding:10px; color:#64748b; font-size:14px;">No staff added</div>';
 }
 
-// Change Attendance Status
 function changeStatus(name, val) {
     if (val === "LEAVE") attendance[name] = "LEAVE";
     else if (val === "HALF DAY") attendance[name] = "HALF DAY";
@@ -419,7 +429,7 @@ function changeStatus(name, val) {
     render();
 }
 
-// Add Staff via Popup
+// Data ko save rakhne ke liye localStorage use karein (taki app band hone par staff delete na ho)
 function addStaff() {
     let n = document.getElementById("newStaff").value.trim().toUpperCase();
     if (!n) return;
@@ -428,7 +438,6 @@ function addStaff() {
     render();
 }
 
-// Remove Staff via Popup
 function removeStaff(n) {
     if(confirm(`Are you sure you want to remove ${n}?`)) {
         delete attendance[n];
@@ -436,19 +445,16 @@ function removeStaff(n) {
     }
 }
 
-// Open/Close Popup Modal
 function toggleModal(show) {
-    document.getElementById("modalOverlay").style.display = show ? "flex" : "none";
+    document.getElementById("modalOverlay").style.style.display = show ? "flex" : "none";
 }
 
-// Close Modal on Outside Click
 function closeModalOutside(e) {
     if (e.target.id === "modalOverlay") {
         toggleModal(false);
     }
 }
 
-// Share via WhatsApp
 function shareWhatsApp() {
     let txt = `NORTHERN GOODS CARRIER\nVARANASI ATTENDANCE\n\nDate: ${document.getElementById('date').innerText}\n\n----------------------------\n\n`;
     for (let n in attendance) {
@@ -458,7 +464,6 @@ function shareWhatsApp() {
     window.open("https://wa.me/?text=" + encodeURIComponent(txt), "_blank");
 }
 
-// Set Date and Initial Load
 document.getElementById("date").innerText = new Date().toDateString();
 render();
 </script>
