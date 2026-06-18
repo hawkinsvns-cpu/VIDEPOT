@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NGC Attendance Pro</title>
+<style>
+body{margin:0;font-family:Inter,Segoe UI,sans-serif;background:#eef4ff}
+.header{background:linear-gradient(135deg,#0f172a,#2563eb);color:#fff;padding:28px;text-align:center}
+.container{max-width:950px;margin:20px auto;padding:15px}
+.card{background:#fff;border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.name{flex:1;font-weight:700;font-size:16px}
+.time{padding:10px 12px;border:1px solid #dbe4ff;border-radius:12px}
+select{padding:10px 12px;border-radius:12px;border:1px solid #dbe4ff;background:#f8fbff}
+.remove{background:#ef4444;color:#fff;border:none;padding:10px 14px;border-radius:12px;cursor:pointer}
+.share{width:100%;padding:16px;border:none;border-radius:16px;background:#22c55e;color:#fff;font-size:18px;cursor:pointer}
+.add{background:#2563eb;color:#fff;border:none;padding:12px 16px;border-radius:12px;cursor:pointer}
+input[type=text]{width:100%;padding:12px;border-radius:12px;border:1px solid #dbe4ff;margin-bottom:10px}
+.badge{padding:10px 14px;border-radius:12px;font-weight:700}
+.leave{background:#fee2e2;color:#dc2626}
+.half{background:#ffedd5;color:#ea580c}
+.topcard{background:white;border-radius:20px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.08);margin-bottom:15px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>NORTHERN GOODS CARRIER</h1>
+<h2>VARANASI ATTENDANCE</h2>
+<div id="date"></div>
+</div>
+
+<div class="container">
+<div class="topcard">
+<input id="newStaff" type="text" placeholder="Add New Staff">
+<button class="add" onclick="addStaff()">Add Staff</button>
+</div>
+
+<div id="staffList"></div>
+
+<button class="share" onclick="shareWhatsApp()">📤 Share on WhatsApp</button>
+</div>
+
+<script>
+const attendance={
+"ANAND TRIPATHI":"09:30",
+"SACHIN YADAV":"09:30",
+"SHIVAM GUPTA":"09:30",
+"SAURABH":"09:30",
+"RAM BHAROS YADAV":"09:30",
+"PRINCE TIWARI":"09:30",
+"AAKASH":"09:30",
+"VISHAL":"09:30"
+};
+
+function render(){
+let out="";
+for(let n in attendance){
+let v=attendance[n];
+out+=`<div class="card"><div class="row">
+<div class="name">${n}</div>`;
+
+if(v==="LEAVE"){
+out+=`<span class="badge leave">LEAVE</span>`;
+}else if(v==="HALF DAY"){
+out+=`<span class="badge half">HALF DAY</span>`;
+}else{
+out+=`<input class="time" type="time" value="${v}" onchange="attendance['${n}']=this.value">`;
+}
+
+out+=`
+<select onchange="changeStatus('${n}',this.value)">
+<option value="">Status</option>
+<option value="LEAVE">Leave</option>
+<option value="HALF DAY">Half Day</option>
+<option value="PRESENT">Present</option>
+</select>
+
+<button class="remove" onclick="removeStaff('${n}')">Remove</button>
+</div></div>`;
+}
+document.getElementById("staffList").innerHTML=out;
+}
+
+function changeStatus(name,val){
+if(val==="LEAVE") attendance[name]="LEAVE";
+else if(val==="HALF DAY") attendance[name]="HALF DAY";
+else if(val==="PRESENT" && (attendance[name]==="LEAVE" || attendance[name]==="HALF DAY")) attendance[name]="09:30";
+render();
+}
+
+function addStaff(){
+let n=document.getElementById("newStaff").value.trim().toUpperCase();
+if(!n) return;
+attendance[n]="09:30";
+document.getElementById("newStaff").value="";
+render();
+}
+
+function removeStaff(n){delete attendance[n];render();}
+
+function shareWhatsApp(){
+let txt=`NORTHERN GOODS CARRIER
+VARANASI ATTENDANCE
+
+Date: ${document.getElementById('date').innerText}
+
+----------------------------
+
+`;
+for(let n in attendance){txt+=`${n}: ${attendance[n]}\n`;}
+txt+=`\n----------------------------\nReport by Varanasi Depot`;
+window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank");
+}
+
+document.getElementById("date").innerText=new Date().toDateString();
+render();
+</script>
+</body>
+</html>
